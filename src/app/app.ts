@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import Fastify, { FastifyError } from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
@@ -35,7 +35,7 @@ export async function buildApp() {
   });
 
   // Error handler
-  app.setErrorHandler((error, request, reply) => {
+  app.setErrorHandler((error: FastifyError, request, reply) => {
     logger.error('Request error', {
       error: error.message,
       stack: error.stack,
@@ -43,7 +43,9 @@ export async function buildApp() {
       method: request.method,
     });
 
-    reply.status(error.statusCode || 500).send({
+    const statusCode = error.statusCode || 500;
+    
+    void reply.status(statusCode).send({
       status: 'error',
       message: error.message,
     });

@@ -1,0 +1,86 @@
+openapi: 3.0.3
+info:
+  title: ISP SNMP API
+  version: 1.0.0
+  description: API v1 for SNMP interactions against OLT devices.
+servers:
+  - url: http://localhost:3000
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags: [Health]
+      responses:
+        '200':
+          description: API is healthy
+  /api/v1/snmp/get:
+    post:
+      summary: Execute SNMP GET operation
+      tags: [SNMP]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SnmpGetRequest'
+      responses:
+        '200':
+          description: Successful SNMP response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SnmpGetResponse'
+        '400':
+          description: Invalid request payload
+        '500':
+          description: Unexpected error
+components:
+  schemas:
+    SnmpGetRequest:
+      type: object
+      required: [vendor, oid, connection]
+      properties:
+        vendor:
+          type: string
+          enum: [generic, huawei, zte]
+        oid:
+          type: string
+          example: 1.3.6.1.2.1.1.1.0
+        connection:
+          type: object
+          required: [host, community, timeout, retries]
+          properties:
+            host:
+              type: string
+              example: 10.0.0.10
+            port:
+              type: integer
+              default: 161
+            community:
+              type: string
+              example: public
+            timeout:
+              type: integer
+              default: 5000
+            retries:
+              type: integer
+              default: 2
+    SnmpResult:
+      type: object
+      properties:
+        oid:
+          type: string
+        type:
+          type: string
+        value: {}
+        timestamp:
+          type: string
+          format: date-time
+    SnmpGetResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        data:
+          $ref: '#/components/schemas/SnmpResult'

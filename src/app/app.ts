@@ -3,15 +3,15 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import { logger } from '../shared/logger/winston.config.js';
-import { env } from '../shared/config/env.validator.js';
+import { healthRoutes } from './routes/health.routes.js';
+import { snmpRoutes } from './routes/v1/snmp.routes.js';
 
 export async function buildApp() {
   const app = Fastify({
-    logger: false, // Usamos winston
+    logger: false,
     trustProxy: true,
   });
 
-  // Security plugins
   await app.register(helmet, {
     contentSecurityPolicy: false,
   });
@@ -25,16 +25,11 @@ export async function buildApp() {
     timeWindow: '1 minute',
   });
 
-  // Health check
-  app.get('/health', async () => {
-    return {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      environment: env.NODE_ENV,
-    };
-  });
+  await app.register(healthRoutes);
+  await app.register(async (v1App) => {
+    await v1App.register(snmpRoutes, { prefix: '/snmp' });
+  }, { prefix: '/api/v1' });
 
-  // Error handler
   app.setErrorHandler((error: FastifyError, request, reply) => {
     logger.error('Request error', {
       error: error.message,
@@ -44,7 +39,7 @@ export async function buildApp() {
     });
 
     const statusCode = error.statusCode || 500;
-    
+
     void reply.status(statusCode).send({
       status: 'error',
       message: error.message,

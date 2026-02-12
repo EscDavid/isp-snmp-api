@@ -1,19 +1,28 @@
 {
   "name": "isp-snmp-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "SNMP API for ISP OLT integration",
+  "type": "module",
+  "main": "dist/index.js",
   "directories": {
     "doc": "docs",
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "vitest run"
   },
-  "keywords": [],
+  "keywords": [
+    "snmp",
+    "fastify",
+    "api"
+  ],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "@fastify/cors": "^11.2.0",
     "@fastify/helmet": "^13.0.2",

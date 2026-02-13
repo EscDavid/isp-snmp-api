@@ -13,6 +13,9 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('24h'),
   SNMP_TIMEOUT: z.coerce.number().default(5000),
   SNMP_RETRIES: z.coerce.number().default(2),
+  OID_ALLOWLIST: z.string().default('1.3.6.1.2.1'),
+  OID_DENYLIST: z.string().default('1.3.6.1.6.3.15'),
+  AUDIT_PERSISTENCE_ENABLED: z.coerce.boolean().default(false),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
 });
 

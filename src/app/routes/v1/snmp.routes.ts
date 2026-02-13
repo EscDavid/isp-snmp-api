@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { SnmpService } from '../../../modules/snmp/snmp.service.js';
 import { OLTVendor } from '../../../shared/types/snmp.types.js';
+import { AppError } from '../../../shared/errors/app-error.js';
 
 const snmpGetBodySchema = z.object({
   vendor: z.nativeEnum(OLTVendor).default(OLTVendor.GENERIC),
@@ -28,11 +29,23 @@ export async function snmpRoutes(app: FastifyInstance): Promise<void> {
       });
     }
 
-    const result = await snmpService.get(parsedBody.data);
+    try {
+      const result = await snmpService.get(parsedBody.data);
 
-    return reply.status(200).send({
-      status: 'ok',
-      data: result,
-    });
+      return reply.status(200).send({
+        status: 'ok',
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof AppError) {
+        return reply.status(error.statusCode).send({
+          status: 'error',
+          code: error.code,
+          message: error.message,
+        });
+      }
+
+      throw error;
+    }
   });
 }

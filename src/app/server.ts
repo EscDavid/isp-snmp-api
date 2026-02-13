@@ -11,8 +11,8 @@ async function start() {
       host: env.HOST,
     });
 
-    logger.info(`🚀 Server running on http://${env.HOST}:${env.PORT}`);
-    logger.info(`📊 Health check: http://${env.HOST}:${env.PORT}/health`);
+    logger.info(`Server running on http://${env.HOST}:${env.PORT}`);
+    logger.info(`Health check: http://${env.HOST}:${env.PORT}/health`);
   } catch (error) {
     logger.error('Failed to start server', error);
     process.exit(1);
